@@ -1,6 +1,6 @@
 package io.viva.httpbase.view;
 
-import io.viva.base.info.MobileInfo;
+import io.viva.httpbase.info.MobileInfo;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
