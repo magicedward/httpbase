@@ -6,37 +6,60 @@ import java.lang.reflect.Modifier;
 import android.util.Log;
 
 public class BeanUtils {
-	public static void setFieldValue(Object paramObject1, String paramString, Object paramObject2) {
-		Field localField = getDeclaredField(paramObject1, paramString);
+
+	/**
+	 * 通过反射方式给某个对象某个字段重新赋值
+	 * @param o
+	 * @param field
+	 * @param paramObject2
+	 */
+	public static void setFieldValue(Object object, String field, Object value) {
+		Field localField = getDeclaredField(object, field);
 		if (localField == null) {
-			throw new IllegalArgumentException("Could not find field [" + paramString + "] on target [" + paramObject1 + "]");
+			throw new IllegalArgumentException("Could not find field [" + field + "] on target [" + object + "]");
 		}
 		makeAccessible(localField);
 		try {
-			localField.set(paramObject1, paramObject2);
-		} catch (IllegalAccessException localIllegalAccessException) {
-			Log.e("", "", localIllegalAccessException);
+			localField.set(object, value);
+		} catch (IllegalAccessException e) {
+			Log.e("", "", e);
 		}
 	}
 
-	protected static Field getDeclaredField(Object paramObject, String paramString) {
-		return getDeclaredField(paramObject.getClass(), paramString);
+	/**
+	 * 获取某个对象某个字段
+	 * @param object
+	 * @param field
+	 * @return
+	 */
+	protected static Field getDeclaredField(Object object, String field) {
+		return getDeclaredField(object.getClass(), field);
 	}
 
-	protected static Field getDeclaredField(Class paramClass, String paramString) {
-		Class localClass = paramClass;
-		while (localClass != Object.class)
+	/**
+	 * 获取某个类对象某个字段
+	 * @param clazz
+	 * @param field
+	 * @return
+	 */
+	protected static Field getDeclaredField(Class<?> clazz, String field) {
+		Class<?> c = clazz;
+		while (c != Object.class)
 			try {
-				return localClass.getDeclaredField(paramString);
-			} catch (NoSuchFieldException localNoSuchFieldException) {
-				localClass = localClass.getSuperclass();
+				return c.getDeclaredField(field);
+			} catch (NoSuchFieldException e) {
+				e.printStackTrace();
 			}
 		return null;
 	}
 
-	protected static void makeAccessible(Field paramField) {
-		if ((!Modifier.isPublic(paramField.getModifiers())) || (!Modifier.isPublic(paramField.getDeclaringClass().getModifiers()))) {
-			paramField.setAccessible(true);
+	/**
+	 * 设置某个对象的某个字段可修改
+	 * @param field
+	 */
+	protected static void makeAccessible(Field field) {
+		if ((!Modifier.isPublic(field.getModifiers())) || (!Modifier.isPublic(field.getDeclaringClass().getModifiers()))) {
+			field.setAccessible(true);
 		}
 	}
 }

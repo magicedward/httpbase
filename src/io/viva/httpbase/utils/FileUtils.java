@@ -8,225 +8,307 @@ import java.io.InputStream;
 
 import org.apache.http.util.EncodingUtils;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 
 public class FileUtils {
-	public static int getDirectorySize(File paramFile) {
-		if (paramFile.listFiles() == null) {
+
+	/**
+	 * @param file
+	 * @return 目录的大小
+	 */
+	public static int getDirectorySize(File file) {
+		if (file.listFiles() == null) {
 			return 0;
 		}
 		int i = 0;
-		for (File localFile : paramFile.listFiles()) {
-			if (localFile.isDirectory()) {
-				i += getDirectorySize(localFile);
+		for (File f : file.listFiles()) {
+			if (f.isDirectory()) {
+				i += getDirectorySize(f);
 			} else {
-				i = (int) (i + localFile.length());
+				i = (int) (i + f.length());
 			}
 		}
 		return i;
 	}
 
-	public static void copyFile(File paramFile1, File paramFile2) {
-		if ((!paramFile1.isFile()) || (!paramFile2.isFile())) {
+	/**
+	 * 拷贝文件
+	 * 
+	 * @param srcFile
+	 * @param destFile
+	 */
+	public static void copyFile(File srcFile, File destFile) {
+		if ((!srcFile.isFile()) || (!destFile.isFile())) {
 			return;
 		}
-		FileInputStream localFileInputStream = null;
-		FileOutputStream localFileOutputStream = null;
+		FileInputStream fileInputStream = null;
+		FileOutputStream fileOutputStream = null;
 		try {
-			localFileInputStream = new FileInputStream(paramFile1);
-			if (!paramFile2.exists()) {
-				if (!paramFile2.getParentFile().exists()) {
-					paramFile2.mkdirs();
+			fileInputStream = new FileInputStream(srcFile);
+			if (!destFile.exists()) {
+				if (!destFile.getParentFile().exists()) {
+					destFile.mkdirs();
 				}
-				paramFile2.createNewFile();
+				destFile.createNewFile();
 			}
-			localFileOutputStream = new FileOutputStream(paramFile2);
-			byte[] arrayOfByte = new byte[10240];
+			fileOutputStream = new FileOutputStream(destFile);
+			byte[] arrayOfByte = new byte[10 * 1024];
 			int i = 0;
-			while ((i = localFileInputStream.read(arrayOfByte)) != -1) {
-				localFileOutputStream.write(arrayOfByte, 0, i);
+			while ((i = fileInputStream.read(arrayOfByte)) != -1) {
+				fileOutputStream.write(arrayOfByte, 0, i);
 			}
-			localFileOutputStream.flush();
-		} catch (IOException localIOException2) {
-			localIOException2.printStackTrace();
+			fileOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 			try {
-				if (localFileOutputStream != null) {
-					localFileOutputStream.close();
-					localFileOutputStream = null;
+				if (fileOutputStream != null) {
+					fileOutputStream.close();
+					fileOutputStream = null;
 				}
-				if (localFileInputStream != null) {
-					localFileInputStream.close();
-					localFileInputStream = null;
+				if (fileInputStream != null) {
+					fileInputStream.close();
+					fileInputStream = null;
 				}
-			} catch (IOException localIOException4) {
-				localIOException4.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
 
-	public static void copyDir(File paramFile1, File paramFile2) {
-		if ((!paramFile1.isDirectory()) || (!paramFile2.isDirectory())) {
+	/**
+	 * 拷贝目录
+	 * 
+	 * @param srcFile
+	 * @param destFile
+	 */
+	public static void copyDir(File srcFile, File destFile) {
+		if ((!srcFile.isDirectory()) || (!destFile.isDirectory())) {
 			return;
 		}
-		if (!paramFile2.exists()) {
-			paramFile2.mkdirs();
+		if (!destFile.exists()) {
+			destFile.mkdirs();
 		}
-		for (File localFile : paramFile1.listFiles()) {
-			if (localFile.isDirectory()) {
-				copyDir(localFile, new File(paramFile2, localFile.getName()));
+		for (File f : srcFile.listFiles()) {
+			if (f.isDirectory()) {
+				copyDir(f, new File(destFile, f.getName()));
 			} else {
-				copyFile(localFile, new File(paramFile2, localFile.getName()));
+				copyFile(f, new File(destFile, f.getName()));
 			}
 		}
 	}
 
-	public static void removeDir(File paramFile) {
-		if (paramFile.exists()) {
-			for (File localFile : paramFile.listFiles()) {
-				if (localFile.isDirectory()) {
-					removeDir(localFile);
+	/**
+	 * 删除目录
+	 * 
+	 * @param file
+	 */
+	public static void removeDir(File file) {
+		if (file.exists()) {
+			for (File f : file.listFiles()) {
+				if (f.isDirectory()) {
+					removeDir(f);
 				} else {
-					localFile.delete();
+					f.delete();
 				}
 			}
-			paramFile.delete();
+			file.delete();
 		}
 	}
 
-	public static String rawRead(Context paramContext, int paramInt) {
+	/**
+	 * 读取raw数据
+	 * 
+	 * @param context
+	 * @param resId
+	 * @return
+	 */
+	public static String rawRead(Context context, int resId) {
 		String str = null;
-		InputStream localInputStream = null;
+		InputStream inputStream = null;
 		try {
-			localInputStream = paramContext.getResources().openRawResource(paramInt);
-			int i = localInputStream.available();
+			inputStream = context.getResources().openRawResource(resId);
+			int i = inputStream.available();
 			byte[] arrayOfByte = new byte[i];
-			localInputStream.read(arrayOfByte);
+			inputStream.read(arrayOfByte);
 			str = EncodingUtils.getString(arrayOfByte, "utf-8");
-		} catch (Exception localException) {
-			localException.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			try {
-				if (localInputStream != null) {
-					localInputStream.close();
-					localInputStream = null;
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
 				}
-			} catch (IOException localIOException3) {
-				localIOException3.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		return str;
 	}
 
-	public static String readAssets(Context paramContext, String paramString) {
+	/**
+	 * 读取assets数据
+	 * 
+	 * @param context
+	 * @param fileName
+	 * @return
+	 */
+	public static String readAssets(Context context, String fileName) {
 		String str = null;
-		InputStream localInputStream = null;
+		InputStream inputStream = null;
 		try {
-			localInputStream = paramContext.getResources().getAssets().open(paramString);
-			int i = localInputStream.available();
+			inputStream = context.getResources().getAssets().open(fileName);
+			int i = inputStream.available();
 			byte[] arrayOfByte = new byte[i];
-			localInputStream.read(arrayOfByte);
+			inputStream.read(arrayOfByte);
 			str = EncodingUtils.getString(arrayOfByte, "utf-8");
-		} catch (Exception localException) {
-			localException.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			try {
-				if (localInputStream != null) {
-					localInputStream.close();
-					localInputStream = null;
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
 				}
-			} catch (IOException localIOException3) {
-				localIOException3.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		return str;
 	}
 
-	public static boolean copyFileFromAssets(Context paramContext, String paramString1, String paramString2) {
-		InputStream localInputStream = null;
-		FileOutputStream localFileOutputStream = null;
+	/**
+	 * 拷贝asset文件到文件系统
+	 * 
+	 * @param context
+	 * @param assetFile
+	 * @param destFile
+	 * @return
+	 */
+	public static boolean copyFileFromAssets(Context context, String assetFile, String destFile) {
+		InputStream inputStream = null;
+		FileOutputStream fileOutputStream = null;
 		try {
-			localInputStream = paramContext.getAssets().open(paramString1);
-			File localFile = new File(paramString2);
-			if (localFile.exists()) {
-				localFile.delete();
+			inputStream = context.getAssets().open(assetFile);
+			File f = new File(destFile);
+			if (f.exists()) {
+				f.delete();
 			}
-			localFile.createNewFile();
-			localFileOutputStream = new FileOutputStream(localFile);
+			f.createNewFile();
+			fileOutputStream = new FileOutputStream(f);
 			byte[] arrayOfByte = new byte[5120];
 			int i = 0;
-			while ((i = localInputStream.read(arrayOfByte)) != -1) {
-				localFileOutputStream.write(arrayOfByte, 0, i);
+			while ((i = inputStream.read(arrayOfByte)) != -1) {
+				fileOutputStream.write(arrayOfByte, 0, i);
 			}
-			localFileOutputStream.flush();
-			boolean bool = true;
-			return bool;
-		} catch (IOException localIOException1) {
-			localIOException1.printStackTrace();
+			fileOutputStream.flush();
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 			try {
-				if (localFileOutputStream != null) {
-					localFileOutputStream.close();
-					localFileOutputStream = null;
+				if (fileOutputStream != null) {
+					fileOutputStream.close();
+					fileOutputStream = null;
 				}
-				if (localInputStream != null) {
-					localInputStream.close();
-					localInputStream = null;
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
 				}
-			} catch (IOException localIOException4) {
-				localIOException4.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		return false;
 	}
 
-	public static String sdcardRead(Context paramContext, String paramString) {
+	/**
+	 * 从sdcard中读取文件内容
+	 * 
+	 * @param context
+	 * @param filePath
+	 * @return
+	 */
+	public static String sdcardRead(Context context, String filePath) {
 		String str = null;
-		FileInputStream localFileInputStream = null;
+		FileInputStream fileInputStream = null;
 		try {
-			localFileInputStream = new FileInputStream(paramString);
-			int i = localFileInputStream.available();
+			fileInputStream = new FileInputStream(filePath);
+			int i = fileInputStream.available();
 			byte[] arrayOfByte = new byte[i];
-			localFileInputStream.read(arrayOfByte);
+			fileInputStream.read(arrayOfByte);
 			str = EncodingUtils.getString(arrayOfByte, "UTF-8");
-		} catch (Exception localException) {
-			localException.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			try {
-				if (localFileInputStream != null) {
-					localFileInputStream.close();
-					localFileInputStream = null;
+				if (fileInputStream != null) {
+					fileInputStream.close();
+					fileInputStream = null;
 				}
-			} catch (IOException localIOException3) {
-				localIOException3.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		return str;
 	}
 
-	public static long getUsableSpace(File paramFile) {
-		if (Build.VERSION.SDK_INT >= 9) {
-			return paramFile.getUsableSpace();
+	/**
+	 * @param file
+	 * @return 文件/文件夹可用空间
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	public static long getUsableSpace(File file) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+			return file.getUsableSpace();
 		}
-		StatFs localStatFs = new StatFs(paramFile.getPath());
-		return localStatFs.getBlockSize() * localStatFs.getAvailableBlocks();
+		StatFs statFs = new StatFs(file.getPath());
+		return statFs.getBlockSizeLong() * statFs.getAvailableBlocksLong();
 	}
 
-	public static File getExternalCacheDir(Context paramContext) {
+	/**
+	 * @param context
+	 * @return sdcard缓存目录
+	 */
+	public static File getExternalCacheDir(Context context) {
 		if (Build.VERSION.SDK_INT >= 8) {
-			return paramContext.getExternalCacheDir();
+			return context.getExternalCacheDir();
 		}
-		String str = "/Android/data/" + paramContext.getPackageName() + "/cache/";
+		String str = "/Android/data/" + context.getPackageName() + "/cache/";
 		return new File(Environment.getExternalStorageDirectory().getPath() + str);
 	}
 
+	/**
+	 * @return 外部存储是否移除
+	 */
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	public static boolean isExternalStorageRemovable() {
-		if (Build.VERSION.SDK_INT >= 9) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
 			return Environment.isExternalStorageRemovable();
 		}
 		return true;
+	}
+
+	/* Checks if external storage is available for read and write */
+	public boolean isExternalStorageWritable() {
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+			return true;
+		}
+		return false;
+	}
+
+	/* Checks if external storage is available to at least read */
+	public boolean isExternalStorageReadable() {
+		String state = Environment.getExternalStorageState();
+		if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+			return true;
+		}
+		return false;
 	}
 }

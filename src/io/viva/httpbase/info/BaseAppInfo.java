@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ActivityManager.RunningTaskInfo;
@@ -15,6 +16,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 
@@ -27,124 +29,162 @@ public class BaseAppInfo {
 	public static String versionName = "0.0.1";
 	public static boolean isDebug = true;
 
-	public static void init(Context paramContext) {
-		ApplicationInfo localApplicationInfo = paramContext.getApplicationInfo();
-		int i = localApplicationInfo.flags;
+	public static void init(Context context) {
+		ApplicationInfo applicationInfo = context.getApplicationInfo();
+		int i = applicationInfo.flags;
 		if ((i & 0x2) != 0) {
 			isDebug = true;
 		} else {
 			isDebug = false;
 		}
-		PackageManager localPackageManager = paramContext.getPackageManager();
+		PackageManager pm = context.getPackageManager();
 		try {
-			PackageInfo localPackageInfo = localPackageManager.getPackageInfo(paramContext.getPackageName(), 16384);
-			versionName = localPackageInfo.versionName;
-			versionCode = localPackageInfo.versionCode;
-		} catch (PackageManager.NameNotFoundException localNameNotFoundException) {
-			localNameNotFoundException.printStackTrace();
+			PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_CONFIGURATIONS);
+			versionName = packageInfo.versionName;
+			versionCode = packageInfo.versionCode;
+		} catch (PackageManager.NameNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static boolean isAppBackRun(Context paramContext) {
-		ActivityManager localActivityManager = (ActivityManager) paramContext.getSystemService("activity");
-		List<RunningTaskInfo> localList = localActivityManager.getRunningTasks(1);
-		return (localList.size() <= 0) || (!paramContext.getPackageName().equals(((ActivityManager.RunningTaskInfo) localList.get(0)).topActivity.getPackageName()));
+	/**
+	 * @param context
+	 * @return 当前是否运行在后台
+	 */
+	public static boolean isAppBackRun(Context context) {
+		ActivityManager activityManger = (ActivityManager) context.getSystemService("activity");
+		List<RunningTaskInfo> list = activityManger.getRunningTasks(1);
+		return (list.size() <= 0) || (!context.getPackageName().equals(((ActivityManager.RunningTaskInfo) list.get(0)).topActivity.getPackageName()));
 	}
 
-	public static boolean isAppForegroundRun(Context paramContext) {
-		ActivityManager localActivityManager = (ActivityManager) paramContext.getSystemService("activity");
-		List<RunningAppProcessInfo> localList = localActivityManager.getRunningAppProcesses();
-		if (localList == null) {
+	/**
+	 * @param context
+	 * @return 当前是否运行在后台
+	 */
+	public static boolean isAppForegroundRun(Context context) {
+		ActivityManager activityManger = (ActivityManager) context.getSystemService("activity");
+		List<RunningAppProcessInfo> list = activityManger.getRunningAppProcesses();
+		if (list == null) {
 			return false;
 		}
-		Iterator<RunningAppProcessInfo> localIterator = localList.iterator();
-		while (localIterator.hasNext()) {
-			ActivityManager.RunningAppProcessInfo localRunningAppProcessInfo = (ActivityManager.RunningAppProcessInfo) localIterator.next();
-			if ((localRunningAppProcessInfo.processName.equals(paramContext.getApplicationContext().getPackageName()))
-					&& (localRunningAppProcessInfo.importance == localRunningAppProcessInfo.IMPORTANCE_FOREGROUND)) {
+		Iterator<RunningAppProcessInfo> it = list.iterator();
+		while (it.hasNext()) {
+			ActivityManager.RunningAppProcessInfo runningAppProcessInfo = (ActivityManager.RunningAppProcessInfo) it.next();
+			if ((runningAppProcessInfo.processName.equals(context.getApplicationContext().getPackageName()))
+					&& (runningAppProcessInfo.importance == runningAppProcessInfo.IMPORTANCE_FOREGROUND)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static String getRootPath(Context paramContext) {
+	/**
+	 * @param context
+	 * @return 应用的数据存储目录
+	 */
+	public static String getRootPath(Context context) {
 		if (appRootPath == null) {
-			appRootPath = Environment.getExternalStorageDirectory().getPath() + "/" + ROOT_DIR + "/" + paramContext.getPackageName() + "/";
-			File localFile1 = new File(appRootPath);
-			if (localFile1.exists()) {
-				if (FileUtils.getDirectorySize(localFile1) > MAX_ROOT_SIZE) {
-					FileUtils.removeDir(localFile1);
-					if (!localFile1.mkdirs()) {
+			appRootPath = Environment.getExternalStorageDirectory().getPath() + File.pathSeparator + ROOT_DIR + File.pathSeparator + context.getPackageName() + File.pathSeparator;
+			File file = new File(appRootPath);
+			if (file.exists()) {
+				if (FileUtils.getDirectorySize(file) > MAX_ROOT_SIZE) {
+					FileUtils.removeDir(file);
+					if (!file.mkdirs()) {
 						appRootPath = null;
 					}
 				}
-			} else if (!localFile1.mkdirs()) {
+			} else if (!file.mkdirs()) {
 				appRootPath = null;
 			}
 			if (appRootPath == null) {
-				File localFile2 = paramContext.getDir("images", Context.MODE_WORLD_WRITEABLE);
-				appRootPath = localFile2.getAbsolutePath();
+				File f = context.getDir("images", Context.MODE_PRIVATE);
+				appRootPath = f.getAbsolutePath();
 			}
 		}
 		return appRootPath;
 	}
 
-	public static String getImagePath(Context paramContext) {
+	/**
+	 * @param context
+	 * @return 应用的图片缓存目录
+	 */
+	public static String getImagePath(Context context) {
 		if (imagePath == null) {
-			imagePath = getRootPath(paramContext) + "images/";
-			File localFile = new File(imagePath);
-			if ((!localFile.exists()) && (!localFile.mkdirs())) {
+			imagePath = getRootPath(context) + "images/";
+			File file = new File(imagePath);
+			if ((!file.exists()) && (!file.mkdirs())) {
 				imagePath = null;
 			}
 		}
 		return imagePath;
 	}
 
+	/**
+	 * @return sdcard卡可用大小
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static long getSDCardAvailable() {
-		File localFile = Environment.getExternalStorageDirectory();
-		StatFs localStatFs = new StatFs(localFile.getPath());
-		long l1 = localStatFs.getBlockSize();
-		long l2 = localStatFs.getAvailableBlocks();
+		File file = Environment.getExternalStorageDirectory();
+		StatFs statFs = new StatFs(file.getPath());
+		long l1 = statFs.getBlockSizeLong();
+		long l2 = statFs.getAvailableBlocksLong();
 		return l2 * l1;
 	}
 
+	/**
+	 * @return 应用程序目录可用大小
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static long getAvailableDataSize() {
-		File localFile = Environment.getDataDirectory();
-		StatFs localStatFs = new StatFs(localFile.getPath());
-		long l1 = localStatFs.getBlockSize();
-		long l2 = localStatFs.getAvailableBlocks();
+		File file = Environment.getDataDirectory();
+		StatFs statFs = new StatFs(file.getPath());
+		long l1 = statFs.getBlockSizeLong();
+		long l2 = statFs.getAvailableBlocksLong();
 		return l2 * l1;
 	}
 
+	/**
+	 * @return 应用程序数据（包括缓存）总大小
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static long getTotalDataSize() {
-		File localFile = Environment.getDataDirectory();
-		StatFs localStatFs = new StatFs(localFile.getPath());
-		long l1 = localStatFs.getBlockSize();
-		long l2 = localStatFs.getBlockCount();
+		File file = Environment.getDataDirectory();
+		StatFs statFs = new StatFs(file.getPath());
+		long l1 = statFs.getBlockSizeLong();
+		long l2 = statFs.getBlockCountLong();
 		return l2 * l1;
 	}
 
+	/**
+	 * @return sdcard存储是否已满
+	 */
 	public static boolean isSDCardFull() {
 		return getSDCardAvailable() == 0L;
 	}
 
+	/**
+	 * 移除缓存目录所有缓存
+	 */
 	public void releasAll() {
 		if (appRootPath != null) {
-			File localFile = new File(appRootPath);
-			if ((localFile.exists()) && (localFile.isDirectory())) {
-				FileUtils.removeDir(localFile);
+			File file = new File(appRootPath);
+			if ((file.exists()) && (file.isDirectory())) {
+				FileUtils.removeDir(file);
 			}
 		}
 	}
 
-	public static String getUserAgent(Context paramContext) {
-		return "SYS=Android;IP=" + MobileInfo.getIp() + ";NT=" + getNetworkType(paramContext) + ";PT=" + MobileInfo.getOperatorNetworkType(paramContext) + ";PN="
-				+ MobileInfo.getOperatorCode(paramContext);
+	public static String getUserAgent(Context context) {
+		return "SYS=Android;IP=" + MobileInfo.getIp() + ";NT=" + getNetworkType(context) + ";PT=" + MobileInfo.getOperatorNetworkType(context) + ";PN="
+				+ MobileInfo.getOperatorCode(context);
 	}
 
-	public static int getNetworkType(Context paramContext) {
-		ConnectivityManager localConnectivityManager = (ConnectivityManager) paramContext.getSystemService("connectivity");
+	/**
+	 * @param context
+	 * @return 活动的网络类型
+	 */
+	public static int getNetworkType(Context context) {
+		ConnectivityManager localConnectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
 		NetworkInfo localNetworkInfo = localConnectivityManager.getActiveNetworkInfo();
 		if ((localNetworkInfo != null) && (localNetworkInfo.isConnected()) && (localNetworkInfo.isAvailable())) {
 			return localNetworkInfo.getType();

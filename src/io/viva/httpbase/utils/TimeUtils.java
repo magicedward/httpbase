@@ -12,47 +12,51 @@ public class TimeUtils {
 	private static SimpleDateFormat format2 = new SimpleDateFormat("yyyy年MM月dd日");
 
 	public static String getDateFormat() {
-		SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.CHINA);
-		return localSimpleDateFormat.format(new Date());
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.CHINA);
+		return simpleDateFormat.format(new Date());
 	}
 
-	public static String getDateFormat(String paramString) {
-		SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat(paramString, Locale.CHINA);
-		return localSimpleDateFormat.format(new Date());
+	public static String getDateFormat(String template) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(template, Locale.CHINA);
+		return simpleDateFormat.format(new Date());
 	}
 
-	public static String getDateFormat(long paramLong, String paramString) {
-		SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat(paramString, Locale.CHINA);
-		return localSimpleDateFormat.format(Long.valueOf(paramLong));
+	public static String getDateFormat(long milliseconds, String template) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(template, Locale.CHINA);
+		return simpleDateFormat.format(Long.valueOf(milliseconds));
 	}
 
-	public static String getDateFormat(long paramLong) {
-		SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
-		return localSimpleDateFormat.format(new Date(paramLong));
+	public static String getDateFormat(long milliseconds) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+		return simpleDateFormat.format(new Date(milliseconds));
 	}
 
-	public static long getTimeInMillis(int paramInt1, int paramInt2, int paramInt3, int paramInt4, int paramInt5, int paramInt6) {
-		GregorianCalendar localGregorianCalendar = new GregorianCalendar(paramInt1, paramInt2, paramInt3, paramInt4, paramInt5, paramInt6);
-		return localGregorianCalendar.getTimeInMillis();
+	public static long getTimeInMillis(int year, int month, int day, int hour, int minute, int second) {
+		GregorianCalendar gregorianCalendar = new GregorianCalendar(year, month, day, hour, minute, second);
+		return gregorianCalendar.getTimeInMillis();
 	}
 
-	public static String getTimeString(long paramLong) {
+	/**
+	 * @param milliseconds
+	 * @return
+	 */
+	public static String getTimeString(long seconds) {
 		long l1 = System.currentTimeMillis();
-		long l2 = l1 - paramLong * 1000L;
+		long l2 = l1 - seconds * 1000L;
 		int i = 0;
-		if (l2 > 86400000L) {
-			i = (int) (l2 / 86400000L);
+		if (l2 > DAY_MILLISE_SECONDS) {
+			i = (int) (l2 / DAY_MILLISE_SECONDS);
 			if (i <= 3) {
 				return new StringBuilder().append(i).append("天前").toString();
 			}
-			int j = new Date(paramLong * 1000L).getYear();
+			int j = new Date(seconds * 1000L).getYear();
 			if (j >= new Date().getYear()) {
-				return format1.format(new Date(paramLong * 1000L));
+				return format1.format(new Date(seconds * 1000L));
 			}
-			return format2.format(new Date(paramLong * 1000L));
+			return format2.format(new Date(seconds * 1000L));
 		}
-		if (l2 > 3600000L) {
-			i = (int) (l2 / 3600000L);
+		if (l2 > HOUR_MILLISE_SECONDS) {
+			i = (int) (l2 / HOUR_MILLISE_SECONDS);
 			if (i > 0) {
 				return new StringBuilder().append(i).append("小时前").toString();
 			}
@@ -65,23 +69,29 @@ public class TimeUtils {
 		return "刚刚";
 	}
 
-	public static String getDuration(int paramInt) {
-		if (paramInt == 0) {
+	/**
+	 * 根据毫秒计算中文字符串
+	 * 
+	 * @param milliseconds
+	 * @return
+	 */
+	public static String getDuration(int milliseconds) {
+		if (milliseconds == 0) {
 			return "0秒";
 		}
-		StringBuilder localStringBuilder = new StringBuilder("");
-		int i = paramInt / 3600;
-		int j = paramInt % 3600 / 60;
-		int k = paramInt % 60;
+		StringBuilder sb = new StringBuilder("");
+		int i = milliseconds / 3600;
+		int j = milliseconds % 3600 / 60;
+		int k = milliseconds % 60;
 		if (i > 0) {
-			localStringBuilder.append(new StringBuilder().append(String.format("%d", new Object[] { Integer.valueOf(i) })).append("小时").toString());
+			sb.append(new StringBuilder().append(String.format("%d", new Object[] { Integer.valueOf(i) })).append("小时").toString());
 		}
 		if (j > 0) {
-			localStringBuilder.append(new StringBuilder().append(String.format("%2d", new Object[] { Integer.valueOf(j) })).append("分钟").toString());
+			sb.append(new StringBuilder().append(String.format("%2d", new Object[] { Integer.valueOf(j) })).append("分钟").toString());
 		}
 		if (k > 0) {
-			localStringBuilder.append(new StringBuilder().append(String.format("%2d", new Object[] { Integer.valueOf(k) })).append("秒").toString());
+			sb.append(new StringBuilder().append(String.format("%2d", new Object[] { Integer.valueOf(k) })).append("秒").toString());
 		}
-		return localStringBuilder.toString();
+		return sb.toString();
 	}
 }

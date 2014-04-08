@@ -28,82 +28,141 @@ import android.view.WindowManager;
 public class MobileInfo {
 	private static DisplayMetrics dm = null;
 
-	public static String getOperatorName(Context paramContext) {
-		TelephonyManager localTelephonyManager = (TelephonyManager) paramContext.getApplicationContext().getSystemService("phone");
-		return localTelephonyManager.getNetworkOperatorName();
+	/**
+	 * @param context
+	 * @return 移动网络运营商的名字
+	 */
+	public static String getOperatorName(Context context) {
+		TelephonyManager telephonyManager = (TelephonyManager) context.getApplicationContext().getSystemService("phone");
+		return telephonyManager.getNetworkOperatorName();
 	}
 
-	public static String getOperatorCode(Context paramContext) {
-		TelephonyManager localTelephonyManager = (TelephonyManager) paramContext.getSystemService("phone");
-		return localTelephonyManager.getNetworkOperator();
+	/**
+	 * @param context
+	 * @return 运营商网络代码
+	 */
+	public static String getOperatorCode(Context context) {
+		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService("phone");
+		return telephonyManager.getNetworkOperator();
 	}
 
-	public static int getOperatorNetworkType(Context paramContext) {
-		TelephonyManager localTelephonyManager = (TelephonyManager) paramContext.getSystemService("phone");
-		return localTelephonyManager.getNetworkType();
+	/**
+	 * Returns a constant indicating the radio technology (network type)
+	 * currently in use on the device for data transmission.
+	 * 
+	 * @return the network type
+	 * 
+	 * @see #NETWORK_TYPE_UNKNOWN
+	 * @see #NETWORK_TYPE_GPRS
+	 * @see #NETWORK_TYPE_EDGE
+	 * @see #NETWORK_TYPE_UMTS
+	 * @see #NETWORK_TYPE_HSDPA
+	 * @see #NETWORK_TYPE_HSUPA
+	 * @see #NETWORK_TYPE_HSPA
+	 * @see #NETWORK_TYPE_CDMA
+	 * @see #NETWORK_TYPE_EVDO_0
+	 * @see #NETWORK_TYPE_EVDO_A
+	 * @see #NETWORK_TYPE_EVDO_B
+	 * @see #NETWORK_TYPE_1xRTT
+	 * @see #NETWORK_TYPE_IDEN
+	 * @see #NETWORK_TYPE_LTE
+	 * @see #NETWORK_TYPE_EHRPD
+	 * @see #NETWORK_TYPE_HSPAP
+	 * 
+	 */
+	public static int getOperatorNetworkType(Context context) {
+		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService("phone");
+		return telephonyManager.getNetworkType();
 	}
 
-	private static DisplayMetrics getDm(Context paramContext) {
+	private static DisplayMetrics getDm(Context context) {
 		if (dm == null) {
-			WindowManager localWindowManager = (WindowManager) paramContext.getSystemService("window");
-			Display localDisplay = localWindowManager.getDefaultDisplay();
+			WindowManager windowManager = (WindowManager) context.getSystemService("window");
+			Display localDisplay = windowManager.getDefaultDisplay();
 			dm = new DisplayMetrics();
 			localDisplay.getMetrics(dm);
 		}
 		return dm;
 	}
 
-	public static int getScreenWidthDip(Context paramContext) {
-		return (int) (getDm(paramContext).widthPixels / getDm(paramContext).density + 0.5F);
+	/**
+	 * @param context
+	 * @return 屏幕宽度dip
+	 */
+	public static int getScreenWidthDip(Context context) {
+		return (int) (getDm(context).widthPixels / getDm(context).density + 0.5F);
 	}
 
-	public static int getScreenHightDip(Context paramContext) {
-		return (int) (getDm(paramContext).heightPixels / getDm(paramContext).density + 0.5F);
+	/**
+	 * @param context
+	 * @return 屏幕高度dip
+	 */
+	public static int getScreenHightDip(Context context) {
+		return (int) (getDm(context).heightPixels / getDm(context).density + 0.5F);
 	}
 
-	public static float getDensity(Context paramContext) {
-		return getDm(paramContext).density;
+	public static float getDensity(Context context) {
+		return getDm(context).density;
 	}
 
-	public static float getDensityDpi(Context paramContext) {
-		return getDm(paramContext).densityDpi;
+	public static float getDensityDpi(Context context) {
+		return getDm(context).densityDpi;
 	}
 
-	public static int dip2px(Context paramContext, float paramFloat) {
-		return (int) (paramFloat * getDensity(paramContext) + 0.5F);
+	public static int dip2px(Context context, float paramFloat) {
+		return (int) (paramFloat * getDensity(context) + 0.5F);
 	}
 
-	public static float px2dip(Context paramContext, int paramInt) {
-		return (int) (paramInt / getDensity(paramContext) + 0.5F);
+	public static float px2dip(Context context, int paramInt) {
+		return (int) (paramInt / getDensity(context) + 0.5F);
 	}
 
-	public static float px2sp(Context paramContext, int paramInt) {
-		return (int) (paramInt / getDm(paramContext).scaledDensity + 0.5F);
+	public static float px2sp(Context context, int paramInt) {
+		return (int) (paramInt / getDm(context).scaledDensity + 0.5F);
 	}
 
-	public static int sp2px(Context paramContext, float paramFloat) {
-		return (int) (paramFloat * getDm(paramContext).scaledDensity + 0.5F);
+	public static int sp2px(Context context, float paramFloat) {
+		return (int) (paramFloat * getDm(context).scaledDensity + 0.5F);
 	}
 
-	public static int getScreenWidthPx(Context paramContext) {
-		return getDm(paramContext).widthPixels;
+	/**
+	 * @param context
+	 * @return 屏幕宽度px
+	 */
+	public static int getScreenWidthPx(Context context) {
+		return getDm(context).widthPixels;
 	}
 
-	public static int getScreenHeightPx(Context paramContext) {
-		return getDm(paramContext).heightPixels;
+	/**
+	 * @param context
+	 * @return 屏幕高度px
+	 */
+	public static int getScreenHeightPx(Context context) {
+		return getDm(context).heightPixels;
 	}
 
-	public static String getScreenResolution(Context paramContext) {
-		return getDm(paramContext).widthPixels + "x" + getDm(paramContext).heightPixels;
+	/**
+	 * @param context
+	 * @return 屏幕分辨率
+	 */
+	public static String getScreenResolution(Context context) {
+		return getDm(context).widthPixels + "x" + getDm(context).heightPixels;
 	}
 
+	/**
+	 * @return 设备名称
+	 */
 	public static String getDeviceName() {
 		return Build.MANUFACTURER + " : " + Build.MODEL;
 	}
 
-	public static String getImei(Context paramContext) {
-		TelephonyManager localTelephonyManager = (TelephonyManager) paramContext.getSystemService("phone");
-		String str = localTelephonyManager.getDeviceId();
+	/**
+	 * @param context
+	 * @return IMEI号
+	 */
+	public static String getImei(Context context) {
+		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService("phone");
+		String str = telephonyManager.getDeviceId();
 		if ((str == null) || ("".equals(str.trim()))) {
 			File localFile = new File(Environment.getExternalStorageDirectory() + "/pwmob/", "INSTALLATION");
 			try {
@@ -125,6 +184,9 @@ public class MobileInfo {
 		return str;
 	}
 
+	/**
+	 * @return 内核版本号
+	 */
 	public static String getFormattedKernelVersion() {
 		try {
 			BufferedReader localBufferedReader = new BufferedReader(new FileReader("/proc/version"), 256);
@@ -150,6 +212,9 @@ public class MobileInfo {
 		return "Unavailable";
 	}
 
+	/**
+	 * @return 内存大小
+	 */
 	public static String getTotalMemory() {
 		String str1 = "/proc/meminfo";
 		long l = 0L;
@@ -166,15 +231,18 @@ public class MobileInfo {
 		return String.valueOf(l);
 	}
 
-	public static String getUUId(Context paramContext) {
-		TelephonyManager localTelephonyManager = (TelephonyManager) paramContext.getSystemService("phone");
-		String str1 = "" + localTelephonyManager.getDeviceId();
-		String str2 = "" + localTelephonyManager.getSimSerialNumber();
-		String str3 = "" + Settings.Secure.getString(paramContext.getContentResolver(), "android_id");
+	public static String getUUId(Context context) {
+		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService("phone");
+		String str1 = "" + telephonyManager.getDeviceId();
+		String str2 = "" + telephonyManager.getSimSerialNumber();
+		String str3 = "" + Settings.Secure.getString(context.getContentResolver(), "android_id");
 		UUID localUUID = new UUID(str3.hashCode(), str1.hashCode() << 32 | str2.hashCode());
 		return localUUID.toString();
 	}
 
+	/**
+	 * @return IP地址
+	 */
 	public static String getIp() {
 		String str = null;
 		try {

@@ -6,7 +6,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 public class PhoneManager {
-	private int heapSize = this.activityManager.getMemoryClass();
+	private int heapSize = this.activityManager.getMemoryClass();// 单个app运行内存大小
 	private int screenWidthPixels;
 	private int screenHeightPixels;
 	public static final int DENSITY_LOW = 120;
@@ -39,17 +39,18 @@ public class PhoneManager {
 		}
 	}
 
-	public static void setContext(Context paramContext) {
-		context = paramContext;
+	public static void setContext(Context c) {
+		context = c;
 	}
 
-	public static void setWindowManager(WindowManager paramWindowManager) {
-		windowManager = paramWindowManager;
+	public static void setWindowManager(WindowManager wm) {
+		windowManager = wm;
 	}
 
 	public static PhoneManager getSharedDeviceManager() {
-		if (sharedDeviceManager == null)
+		if (sharedDeviceManager == null) {
 			sharedDeviceManager = new PhoneManager();
+		}
 		return sharedDeviceManager;
 	}
 

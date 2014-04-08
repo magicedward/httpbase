@@ -15,49 +15,65 @@ import android.widget.Toast;
 public class ScreenShot {
 	static final String TAG = "ScreenShot";
 
-	private static Bitmap takeScreenShot(Activity paramActivity) {
-		View localView = paramActivity.getWindow().getDecorView();
-		localView.setDrawingCacheEnabled(true);
-		localView.buildDrawingCache();
-		Bitmap localBitmap1 = localView.getDrawingCache();
-		Rect localRect = new Rect();
-		paramActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(localRect);
-		int i = localRect.top;
+	/**
+	 * 返回
+	 * @param activity
+	 * @return
+	 */
+	private static Bitmap takeScreenShot(Activity activity) {
+		View view = activity.getWindow().getDecorView();
+		view.setDrawingCacheEnabled(true);
+		view.buildDrawingCache();
+		Bitmap bitmap = view.getDrawingCache();
+		Rect rect = new Rect();
+		activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+		int i = rect.top;
 		Log.i("TAG", "" + i);
-		int j = paramActivity.getWindowManager().getDefaultDisplay().getWidth();
-		int k = paramActivity.getWindowManager().getDefaultDisplay().getHeight();
-		Bitmap localBitmap2 = Bitmap.createBitmap(localBitmap1, 0, i, j, k - i);
-		localView.destroyDrawingCache();
-		return localBitmap2;
+		int j = activity.getWindowManager().getDefaultDisplay().getWidth();
+		int k = activity.getWindowManager().getDefaultDisplay().getHeight();
+		Bitmap b = Bitmap.createBitmap(bitmap, 0, i, j, k - i);
+		view.destroyDrawingCache();
+		return b;
 	}
 
-	private static void savePic(Bitmap paramBitmap, String paramString) {
-		Log.d("ScreenShot", "savpic : " + paramString);
-		FileOutputStream localFileOutputStream = null;
+	/**
+	 * @param bitmap
+	 * @param filePath
+	 */
+	private static void savePic(Bitmap bitmap, String filePath) {
+		Log.d("ScreenShot", "savpic : " + filePath);
+		FileOutputStream fileOutputStream = null;
 		try {
-			localFileOutputStream = new FileOutputStream(paramString);
-			if (null != localFileOutputStream) {
-				paramBitmap.compress(Bitmap.CompressFormat.PNG, 90, localFileOutputStream);
-				localFileOutputStream.flush();
-				localFileOutputStream.close();
+			fileOutputStream = new FileOutputStream(filePath);
+			if (null != fileOutputStream) {
+				bitmap.compress(Bitmap.CompressFormat.PNG, 90, fileOutputStream);
+				fileOutputStream.flush();
+				fileOutputStream.close();
 			}
-		} catch (FileNotFoundException localFileNotFoundException) {
-			localFileNotFoundException.printStackTrace();
-		} catch (IOException localIOException) {
-			localIOException.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	public static void shoot(Activity paramActivity, String paramString) {
-		savePic(takeScreenShot(paramActivity), paramString);
-		Toast.makeText(paramActivity, "截屏成功,图片保存在 " + paramString, 0).show();
+	/**
+	 * @param activity
+	 * @param filePath
+	 */
+	public static void shoot(Activity activity, String filePath) {
+		savePic(takeScreenShot(activity), filePath);
+		Toast.makeText(activity, "截屏成功,图片保存在 " + filePath, 0).show();
 	}
 
-	public static void shoot(Activity paramActivity) {
+	/**
+	 * @param activity
+	 */
+	public static void shoot(Activity activity) {
 		if (Environment.getExternalStorageDirectory() != null) {
-			shoot(paramActivity, Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".png");
+			shoot(activity, Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".png");
 		} else {
-			Toast.makeText(paramActivity, "请插入存储卡", 0).show();
+			Toast.makeText(activity, "请插入存储卡", 0).show();
 		}
 	}
 }

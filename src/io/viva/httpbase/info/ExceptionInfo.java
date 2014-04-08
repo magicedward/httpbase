@@ -12,9 +12,9 @@ public class ExceptionInfo implements Serializable {
 	private ExceptionInfo() {
 	}
 
-	public ExceptionInfo(String paramString1, String paramString2, long paramLong) {
-		this.exception = paramString1;
-		this.type = paramString2;
-		this.createTime = String.valueOf(paramLong);
+	public ExceptionInfo(String exception, String type, long createTime) {
+		this.exception = exception;
+		this.type = type;
+		this.createTime = String.valueOf(createTime);
 	}
 }

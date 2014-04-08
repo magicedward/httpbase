@@ -9,70 +9,93 @@ import java.io.InputStream;
 public class IOUtils {
 	public static final int IO_BUFFER_SIZE = 16 * 10244;
 
-	public static String readString(InputStream paramInputStream) throws IOException {
-		return new String(readBytes(paramInputStream));
+	/**
+	 * 从输入流中读取到字符串中
+	 * 
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
+	public static String readString(InputStream in) throws IOException {
+		return new String(readBytes(in));
 	}
 
-	public static byte[] readBytes(InputStream paramInputStream) throws IOException {
-		byte[] arrayOfByte1 = new byte[0];
-		ByteArrayOutputStream localByteArrayOutputStream = new ByteArrayOutputStream();
+	/**
+	 * 从输入流中读取到字节数组中
+	 * 
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] readBytes(InputStream in) throws IOException {
+		byte[] result = new byte[0];
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		byte[] arrayOfByte2 = new byte[IO_BUFFER_SIZE];
 		int i = -1;
 		try {
-			while ((i = paramInputStream.read(arrayOfByte2)) != -1) {
-				localByteArrayOutputStream.write(arrayOfByte2, 0, i);
+			while ((i = in.read(arrayOfByte2)) != -1) {
+				byteArrayOutputStream.write(arrayOfByte2, 0, i);
 			}
-			arrayOfByte1 = localByteArrayOutputStream.toByteArray();
-		} catch (IOException localIOException) {
-			localIOException.printStackTrace();
-			throw localIOException;
+			result = byteArrayOutputStream.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw e;
 		} finally {
 			try {
-				if (localByteArrayOutputStream != null) {
-					localByteArrayOutputStream.close();
-					localByteArrayOutputStream = null;
+				if (byteArrayOutputStream != null) {
+					byteArrayOutputStream.close();
+					byteArrayOutputStream = null;
 				}
-				if (paramInputStream != null) {
-					paramInputStream.close();
-					paramInputStream = null;
+				if (in != null) {
+					in.close();
+					in = null;
 				}
-			} catch (Exception localException2) {
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
-		return arrayOfByte1;
+		return result;
 	}
 
-	public static void writeToLocal(InputStream paramInputStream, String paramString) throws IOException {
-		File localFile = new File(paramString);
-		FileOutputStream localFileOutputStream = null;
-		if (!localFile.exists()) {
-			File localObject1 = localFile.getParentFile();
-			if (!((File) localObject1).exists()) {
-				((File) localObject1).mkdirs();
+	/**
+	 * 将输入流写入文件
+	 * 
+	 * @param in
+	 * @param filePath
+	 * @throws IOException
+	 */
+	public static void writeToLocal(InputStream in, String filePath) throws IOException {
+		File file = new File(filePath);
+		FileOutputStream fileOutputStream = null;
+		if (!file.exists()) {
+			File parentFile = file.getParentFile();
+			if (!parentFile.exists()) {
+				parentFile.mkdirs();
 			}
-			localFile.createNewFile();
+			file.createNewFile();
 		}
-		localFileOutputStream = new FileOutputStream(localFile);
-		Object localObject1 = new byte[IO_BUFFER_SIZE];
+		fileOutputStream = new FileOutputStream(file);
+		byte[] b = new byte[IO_BUFFER_SIZE];
 		int i = -1;
 		try {
-			while ((i = paramInputStream.read((byte[]) localObject1)) != -1) {
-				localFileOutputStream.write((byte[]) localObject1, 0, i);
+			while ((i = in.read(b)) != -1) {
+				fileOutputStream.write((byte[]) b, 0, i);
 			}
-		} catch (IOException localIOException) {
-			localIOException.printStackTrace();
-			throw localIOException;
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw e;
 		} finally {
 			try {
-				if (localFileOutputStream != null) {
-					localFileOutputStream.close();
-					localFileOutputStream = null;
+				if (fileOutputStream != null) {
+					fileOutputStream.close();
+					fileOutputStream = null;
 				}
-				if (paramInputStream != null) {
-					paramInputStream.close();
-					paramInputStream = null;
+				if (in != null) {
+					in.close();
+					in = null;
 				}
-			} catch (Exception localException2) {
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

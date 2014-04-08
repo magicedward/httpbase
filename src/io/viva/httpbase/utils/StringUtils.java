@@ -6,52 +6,52 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtils {
-	public static int adjustFontSize(int paramInt1, int paramInt2) {
-		if (paramInt1 <= 240) {
+	
+	public static int adjustFontSize(int i) {
+		if (i <= 240) {
 			return 10;
 		}
-		if (paramInt1 <= 320) {
+		if (i <= 320) {
 			return 14;
 		}
-		if (paramInt1 <= 480) {
+		if (i <= 480) {
 			return 24;
 		}
-		if (paramInt1 <= 540) {
+		if (i <= 540) {
 			return 26;
 		}
-		if (paramInt1 <= 800) {
+		if (i <= 800) {
 			return 30;
 		}
 		return 30;
 	}
 
-	public static boolean checkDate(String paramString1, String paramString2) {
-		SimpleDateFormat localSimpleDateFormat = new SimpleDateFormat(paramString2);
-		Date localDate = null;
+	public static boolean checkDate(String destStr, String pattern) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		Date date = null;
 		try {
-			localDate = localSimpleDateFormat.parse(paramString1);
-		} catch (Exception localException) {
+			date = simpleDateFormat.parse(destStr);
+		} catch (Exception e) {
 			return false;
 		}
-		String str = localSimpleDateFormat.format(localDate);
-		return paramString1.equals(str);
+		return destStr.equals(simpleDateFormat.format(date));
 	}
 
-	public boolean checkEmail(String paramString) {
-		Pattern localPattern = Pattern.compile("^/w+([-.]/w+)*@/w+([-]/w+)*/.(/w+([-]/w+)*/.)*[a-z]{2,3}$");
-		Matcher localMatcher = localPattern.matcher(paramString);
-		return localMatcher.matches();
+	public boolean checkEmail(String str) {
+		Pattern pattern = Pattern.compile("^/w+([-.]/w+)*@/w+([-]/w+)*/.(/w+([-]/w+)*/.)*[a-z]{2,3}$");
+		Matcher matcher = pattern.matcher(str);
+		return matcher.matches();
 	}
 
-	public boolean checkPhone(String paramString) {
-		Pattern localPattern = Pattern.compile("^13/d{9}||15[8,9]/d{8}$");
-		Matcher localMatcher = localPattern.matcher(paramString);
-		return localMatcher.matches();
+	public boolean checkPhone(String str) {
+		Pattern pattern = Pattern.compile("^13/d{9}||15[8,9]/d{8}$");
+		Matcher matcher = pattern.matcher(str);
+		return matcher.matches();
 	}
 
-	public static boolean isNumeric(String paramString) {
-		Pattern localPattern = Pattern.compile("-?[0-9]+.?[0-9]+");
-		Matcher localMatcher = localPattern.matcher(paramString);
-		return localMatcher.matches();
+	public static boolean isNumeric(String str) {
+		Pattern pattern = Pattern.compile("-?[0-9]+.?[0-9]+");
+		Matcher matcher = pattern.matcher(str);
+		return matcher.matches();
 	}
 }

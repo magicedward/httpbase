@@ -19,22 +19,38 @@ public abstract class AbsSqlDao<T> {
 		this.mTableName = tableName;
 	}
 
+	/**
+	 * @param column 为该表增加一个TEXT类型数据字段
+	 */
 	public void addTextColumn(String column) {
 		exeSQL("ALTER TABLE '" + this.mTableName + "' ADD '" + column + "' TEXT;");
 	}
 
+	/**
+	 * @param column 为该表增加一个INTEGER类型数据字段
+	 */
 	public void addIntegerColumn(String column) {
 		exeSQL("ALTER TABLE '" + this.mTableName + "' ADD '" + column + "' INTEGER DEFAULT 0;");
 	}
 
+	/**
+	 * @param column 为该表增加一个REAL类型数据字段
+	 */
 	public void addRealColumn(String column) {
 		exeSQL("ALTER TABLE '" + this.mTableName + "' ADD '" + column + "' REAL DEFAULT 0;");
 	}
 
+	/**
+	 * @param column 为该表增加一个BLOB类型数据字段
+	 */
 	public void addBlobColumn(String column) {
 		exeSQL("ALTER TABLE '" + this.mTableName + "' ADD '" + column + "' BLOB  DEFAULT null;");
 	}
 
+	/**
+	 * @param values 
+	 * @return
+	 */
 	public long insert(ContentValues values) {
 		synchronized (_writeLock) {
 			long l = -1L;
@@ -58,10 +74,18 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param values
+	 */
 	public void insert(ContentValues[] values) {
 		insert(values, 0, values.length);
 	}
 
+	/**
+	 * @param values
+	 * @param startIndex
+	 * @param endIndex
+	 */
 	public void insert(ContentValues[] values, int startIndex, int endIndex) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -89,6 +113,10 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param values
+	 * @return
+	 */
 	public long replace(ContentValues values) {
 		synchronized (_writeLock) {
 			long l = -1L;
@@ -112,10 +140,18 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param values
+	 */
 	public void replace(ContentValues[] values) {
 		replace(values, 0, values.length);
 	}
 
+	/**
+	 * @param values
+	 * @param startIndex
+	 * @param endIndex
+	 */
 	public void replace(ContentValues[] values, int startIndex, int endIndex) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -143,10 +179,19 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param whereClause
+	 * @return
+	 */
 	public long delete(String whereClause) {
 		return delete(whereClause, null);
 	}
 
+	/**
+	 * @param whereClause
+	 * @param whereArgs
+	 * @return
+	 */
 	public long delete(String whereClause, String[] whereArgs) {
 		synchronized (_writeLock) {
 			long l = 0L;
@@ -170,6 +215,12 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param values
+	 * @param whereClause
+	 * @param whereArgs
+	 * @return
+	 */
 	public long update(ContentValues values, String whereClause, String[] whereArgs) {
 		synchronized (_writeLock) {
 			long l = -1L;
@@ -193,6 +244,10 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param values
+	 * @param whereClause
+	 */
 	public void update(ContentValues[] values, String[] whereClause) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -220,6 +275,15 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param columns
+	 * @param selection
+	 * @param selectionArgs
+	 * @param groupBy
+	 * @param having
+	 * @param orgerBy
+	 * @return
+	 */
 	public T queryForObject(String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orgerBy) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -263,6 +327,15 @@ public abstract class AbsSqlDao<T> {
 		return null;
 	}
 
+	/**
+	 * @param columns
+	 * @param selection
+	 * @param selectionArgs
+	 * @param groupBy
+	 * @param having
+	 * @param orderBy
+	 * @return
+	 */
 	public List<T> queryForList(String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
 		ArrayList<T> list = new ArrayList<T>();
 		synchronized (_writeLock) {
@@ -296,6 +369,9 @@ public abstract class AbsSqlDao<T> {
 		return list;
 	}
 
+	/**
+	 * @param sqls sql语句
+	 */
 	public void exeSQLs(String[] sqls) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -322,6 +398,9 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * 删除该表中所有数据
+	 */
 	public void clear() {
 		synchronized (_writeLock) {
 			exeSQL("delete from " + this.mTableName + ";");
@@ -349,6 +428,10 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param sql
+	 * @param bindArgs
+	 */
 	public void exeSQL(String sql, Object[] bindArgs) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -370,6 +453,11 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param sql
+	 * @param objects
+	 * @return
+	 */
 	public long insert(String sql, Object[] objects) {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -419,6 +507,9 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @return 该表中的所有数据字段
+	 */
 	public List<String> getColumnNames() {
 		synchronized (_writeLock) {
 			ArrayList<String> list = new ArrayList<String>();
@@ -438,6 +529,9 @@ public abstract class AbsSqlDao<T> {
 		return null;
 	}
 
+	/**
+	 * @return 该表中的数据总量
+	 */
 	public int getDataCount() {
 		synchronized (_writeLock) {
 			SQLiteDatabase database = null;
@@ -474,6 +568,10 @@ public abstract class AbsSqlDao<T> {
 		}
 	}
 
+	/**
+	 * @param cusor
+	 * @return
+	 */
 	public T cursorRowToObject(Cursor cusor) {
 		return null;
 	}
