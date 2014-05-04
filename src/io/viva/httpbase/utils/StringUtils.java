@@ -1,5 +1,7 @@
 package io.viva.httpbase.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -53,5 +55,17 @@ public class StringUtils {
 		Pattern pattern = Pattern.compile("-?[0-9]+.?[0-9]+");
 		Matcher matcher = pattern.matcher(str);
 		return matcher.matches();
+	}
+	
+	public static boolean isNull(String str) {
+		if (str == null) {
+			return false;
+		} else {
+			return "".equals(str.trim());
+		}
+	}
+	
+	public static String encoding(String str) throws UnsupportedEncodingException {
+		return URLEncoder.encode(str, "UTF-8");
 	}
 }

@@ -9,7 +9,7 @@ public class BaseApplication extends Application implements CrashHandler.OnCrash
 	private static final float TARGET_HEAP_UTILIZATION = 0.75F;
 	private static BaseApplication mApplication;
 
-	public static BaseApplication getApplication() {
+	public static synchronized BaseApplication getApplication() {
 		return mApplication;
 	}
 
